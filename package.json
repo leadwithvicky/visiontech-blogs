@@ -17,8 +17,8 @@
     "mongoose": "^8.17.1",
     "next": "15.4.6",
     "nodemailer": "^7.0.5",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-quill": "^2.0.0",
     "react-quill-new": "^3.6.0"
   },
