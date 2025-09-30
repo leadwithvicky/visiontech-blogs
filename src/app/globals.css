@@ -103,6 +103,12 @@ th, td {
 .vt-accent-border { border-color: var(--vt-accent); }
 .vt-cta-text { color: var(--vt-cta); }
 
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Remove any dark-mode overrides to keep the site bright and readable */
 @media (prefers-color-scheme: dark) {
   :root { /* keep the same light palette */ }

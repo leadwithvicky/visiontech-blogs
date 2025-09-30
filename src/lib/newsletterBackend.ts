@@ -54,7 +54,12 @@ interface EmailResult {
 }
 
 // Environment variables
-const MONGO_URI = process.env.MONGO_URI;
+// Sanitize to remove hidden characters that can break MongoDB URI parsing (e.g., BOM, zero-width spaces)
+const RAW_MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = RAW_MONGO_URI
+  ?.replace(/\u200B|\u200C|\u200D|\uFEFF/g, '') // zero-width chars
+  ?.replace(/\n|\r/g, '') // stray newlines
+  ?.trim();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
@@ -81,9 +86,21 @@ if (!global.__mongoose_conn) {
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI!, {
+    // Validate URI early to provide a clearer error than MongoParseError
+    const isValidUri = typeof MONGO_URI === 'string' && (MONGO_URI.startsWith('mongodb://') || MONGO_URI.startsWith('mongodb+srv://'));
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const scheme = typeof MONGO_URI === 'string' && MONGO_URI.includes('://') ? MONGO_URI.split('://')[0] : String(MONGO_URI);
+        console.log('[DB] MONGO_URI scheme detected:', scheme);
+      } catch {}
+    }
+    if (!isValidUri) {
+      throw new Error('Invalid MONGO_URI: expected to start with "mongodb://" or "mongodb+srv://". Check your environment (.env.local) and restart the server.');
+    }
+
+    cached.promise = mongoose.connect(MONGO_URI, {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
     }).then((m) => m);
   }
