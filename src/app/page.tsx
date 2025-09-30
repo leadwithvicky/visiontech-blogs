@@ -479,9 +479,9 @@ export default function HomePage() {
             >
               <Link
                 href={`/newsletter/${n._id}`}
-                className="group block rounded-2xl overflow-hidden bg-white/80 backdrop-blur border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                className="group block rounded-2xl overflow-hidden bg-white/80 backdrop-blur border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 h-[400px] flex flex-col"
               >
-                <div className="relative aspect-[16/9] overflow-hidden">
+                <div className="relative aspect-[16/9] overflow-hidden flex-shrink-0">
                   <Image
                     src={n.imageUrl || '/next.svg'}
                     alt={n.title}
@@ -503,28 +503,30 @@ export default function HomePage() {
                     )}
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FFD700] to-[#FF6F00] text-black font-semibold">
-                      {getCategory(n)}
-                    </span>
-                    {n.date && (
-                      <span className="text-xs text-gray-500 font-medium">
-                        {new Date(n.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
+                <div className="p-6 flex flex-col justify-between flex-grow overflow-hidden">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FFD700] to-[#FF6F00] text-black font-semibold">
+                        {getCategory(n)}
                       </span>
-                    )}
+                      {n.date && (
+                        <span className="text-xs text-gray-500 font-medium">
+                          {new Date(n.date).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{n.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                      {n.description || (typeof n.content === 'string' ? 
+                        `${n.content.replace(/<[^>]+>/g, '').slice(0, 120)}...` : 
+                        'No description available'
+                      )}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{n.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
-                    {n.description || (typeof n.content === 'string' ? 
-                      `${n.content.replace(/<[^>]+>/g, '').slice(0, 120)}...` : 
-                      'No description available'
-                    )}
-                  </p>
                 </div>
               </Link>
             </div>
@@ -586,7 +588,7 @@ export default function HomePage() {
         
         {/* Results Info */}
         {!loading && (
-          <div className="text-center mt-4 text-sm text-gray-600">
+          <div className="text-center mt-4 text-sm p-5 text-gray-600">
             Showing {startIndex + 1}-{Math.min(endIndex, filtered.length)} of {filtered.length} newsletters
             {filter !== 'All' && ` in ${filter}`}
           </div>

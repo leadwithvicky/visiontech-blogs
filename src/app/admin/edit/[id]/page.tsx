@@ -161,6 +161,28 @@ export default function EditNewsletterPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading(true);
+    const data = new FormData();
+    data.append('image', file);
+    try {
+      const res = await fetch(`${API_BASE}/api/uploads`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: data,
+      });
+      const json = await res.json();
+      const absoluteUrl = json.url?.startsWith('http') ? json.url : `${API_BASE}${json.url || ''}`;
+      setForm(prev => ({ ...prev, imageUrl: absoluteUrl }));
+    } catch (err) {
+      alert('Image upload failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const editor = editorRef.current;
@@ -225,6 +247,11 @@ export default function EditNewsletterPage() {
           <input className="w-full border border-[#8B4513]/30 p-2 rounded" name="title" placeholder="Title" value={form.title} onChange={handleChange} />
           <input className="w-full border border-[#8B4513]/30 p-2 rounded" name="author" placeholder="Author" value={form.author} onChange={handleChange} />
           <input className="w-full border border-[#8B4513]/30 p-2 rounded" name="description" placeholder="Short description" value={form.description} onChange={handleChange} />
+        </div>
+        <div className="space-y-2">
+          <label className="block text-sm">Cover Image (used as thumbnail)</label>
+          <input type="file" accept="image/*" onChange={handleImage} />
+          {loading ? <p>Uploading...</p> : form.imageUrl && <img src={form.imageUrl} alt="preview" className="max-h-40 rounded" />}
         </div>
         <div className="border border-[#8B4513]/30 rounded">
           <div ref={editorElRef} />
